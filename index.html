@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Cupos">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FFF4F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A0F15" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="cupos-logo.svg">
 <title>Cupos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,6 +63,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; }
 .muted { color: var(--muted); font-size: 14px; }
 .lede { max-width: 46ch; color: var(--muted); margin: 0 0 16px; }
 .banner { background: var(--warn-soft); color: var(--warn); padding: 10px 14px; border-radius: 14px; margin-bottom: 14px; font-weight: 600; }
+.reminder { background: var(--rose-soft); border: 2px solid var(--rose); border-radius: 22px; padding: 14px 16px; margin-bottom: 18px; }
+.reminder p { margin: 0 0 12px; }
+.reminder-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.reminder-actions .primary { flex: 1; }
 
 /* Botones e inputs */
 .primary, .ghost, .small { border-radius: 14px; font-weight: 700; padding: 12px 18px; border: 1.5px solid transparent; min-height: 46px; }
@@ -267,7 +276,7 @@ const Calendar = {
 const STORAGE_KEY = 'cupos-carpool-v1';
 const defaultState = () => ({
   version: 1,
-  settings: { labels: { subida: 'Subida', bajada: 'Bajada' }, fares: { subida: 0, bajada: 0 }, workDays: [1, 2, 3, 4], lastMethod: 'efectivo', pinHash: '' },
+  settings: { labels: { subida: 'Subida', bajada: 'Bajada' }, fares: { subida: 0, bajada: 0 }, workDays: [1, 2, 3, 4], lastMethod: 'efectivo', pinHash: '', backupEvery: 7, lastBackup: '', backupSnooze: '' },
   trips: {},
   expenses: [],
   goals: [],
@@ -419,6 +428,36 @@ const GoalPlanner = {
     if (!open.length) return null;
     const worst = open.reduce((a, b) => (b.perTrip > a.perTrip ? b : a));
     return { worst, minPerTrip: worst.minPerTrip, tight: worst.status === 'tight' };
+  },
+};
+
+/* ================= Recordatorio de copia ================= */
+const BackupReminder = {
+  daysAgo: k => Math.round((Calendar.date(Calendar.today()) - Calendar.date(k)) / 86400000),
+  since: state => {
+    if (state.settings.lastBackup) return state.settings.lastBackup;
+    const keys = Object.keys(state.trips).sort();
+    return keys.length ? keys[0] : '';
+  },
+  due: state => {
+    const s = state.settings;
+    const since = BackupReminder.since(state);
+    if (!since || s.backupSnooze === Calendar.today()) return null;
+    const days = BackupReminder.daysAgo(since);
+    return days >= (s.backupEvery || 7) ? days : null;
+  },
+  lastText: state => {
+    const k = state.settings.lastBackup;
+    if (!k) return 'Todavía no has hecho ninguna copia.';
+    const d = BackupReminder.daysAgo(k);
+    if (d <= 0) return 'Última copia: hoy.';
+    if (d === 1) return 'Última copia: ayer.';
+    return `Última copia: hace ${d} días.`;
+  },
+  mark: () => {
+    app.state.settings.lastBackup = Calendar.today();
+    app.state.settings.backupSnooze = '';
+    commit();
   },
 };
 
@@ -770,7 +809,7 @@ const renderSettings = () => {
       <label class="field"><span>Nombre del trayecto</span><input class="text" type="text" maxlength="20" data-field="label" data-dir="${dir}" value="${esc(label(dir))}"></label>
       <label class="field"><span>Tarifa por pasajero</span><span class="money"><span>$</span><input type="text" inputmode="numeric" data-field="fare" data-dir="${dir}" value="${moneyInput(s.fares[dir])}" placeholder="0"></span></label>
     </div>`).join('');
-  const backupBox = ui.backupText ? `<textarea class="backup" readonly aria-label="Copia de seguridad">${esc(ui.backupText)}</textarea><p class="muted">Selecciona todo el texto, cópialo y guárdalo en Notas o envíatelo por WhatsApp.</p>` : '';
+  const backupBox = ui.backupText ? `<textarea class="backup" readonly aria-label="Copia de seguridad">${esc(ui.backupText)}</textarea><p class="muted">Selecciona todo el texto, cópialo y guárdalo en Notas o envíatelo por WhatsApp.</p><button class="ghost" data-action="backup-done">Ya la guardé</button>` : '';
   return `<h1 class="view-title">Ajustes</h1>
     <div class="section-head"><h2>Trayectos y tarifas</h2></div>
     <p class="lede">La tarifa es la que aparece por defecto al registrar un viaje. Cada día la puedes cambiar.</p>
@@ -779,7 +818,9 @@ const renderSettings = () => {
     <div class="chips" role="group" aria-label="Días de trabajo">${days}</div>
     <p class="muted">Las metas se calculan solo con estos días.</p>
     <div class="section-head"><h2>Copia de seguridad</h2></div>
-    <p class="lede">Tus datos se guardan en este dispositivo. Haz una copia cada semana; también sirve para pasar tus datos del iPhone al iPad.</p>
+    <p class="lede">Tus datos se guardan solo en este dispositivo. La copia te protege si borras la app o cambias de celular, y sirve para pasar tus datos del iPhone al iPad.</p>
+    <p><strong>${BackupReminder.lastText(state)}</strong></p>
+    <div class="field"><span>Recordarme hacer copia cada</span><div class="chips" role="group" aria-label="Frecuencia del recordatorio">${[3, 7, 15].map(n => `<button class="chip-btn${(s.backupEvery || 7) === n ? ' on' : ''}" data-action="backup-every" data-n="${n}" aria-pressed="${(s.backupEvery || 7) === n}">${n} días</button>`).join('')}</div></div>
     <div class="stack">
       <button class="primary" data-action="backup-download">Descargar copia</button>
       <button class="ghost" data-action="backup-copy">Copiar copia como texto</button>
@@ -795,12 +836,23 @@ const renderSettings = () => {
     <button class="ghost danger" data-action="reset-all">Borrar todos los datos</button>`;
 };
 
+const renderBackupReminder = () => {
+  const days = BackupReminder.due(app.state);
+  if (days === null) return '';
+  const text = app.state.settings.lastBackup
+    ? `Hace ${plural(days, 'día', 'días')} no haces copia de tus datos.`
+    : 'Todavía no has hecho una copia de tus datos.';
+  return `<div class="reminder" role="note"><p><strong>${text}</strong> Cópiala y pégala en tu WhatsApp o en Notas, por si algo le pasa al celular.</p>
+    <div class="reminder-actions"><button class="primary" data-action="backup-copy">Copiar copia ahora</button><button class="ghost" data-action="backup-snooze">Mañana</button></div></div>`;
+};
+
 /* ================= Render principal ================= */
 const VIEWS = { hoy: renderToday, semana: renderWeek, metas: renderGoals, gastos: renderExpenses, ajustes: renderSettings };
 const render = () => {
   clearTimeout(renderTimer);
   const banner = CarpoolStore.available ? '' : '<p class="banner">Este navegador no está guardando tus datos. Descarga una copia en Ajustes antes de cerrar.</p>';
-  document.getElementById('view').innerHTML = banner + VIEWS[app.ui.tab]();
+  const reminder = app.ui.tab === 'hoy' ? renderBackupReminder() : '';
+  document.getElementById('view').innerHTML = banner + reminder + VIEWS[app.ui.tab]();
   document.getElementById('tabs').innerHTML = TABS.map(([id, name]) => `<button class="tab" data-action="tab" data-tab="${id}"${app.ui.tab === id ? ' aria-current="page"' : ''}>${Icons[id]}<span>${name}</span></button>`).join('');
   document.getElementById('sheet-root').innerHTML = app.ui.sheet ? SHEETS[app.ui.sheet.type]() : '';
 };
@@ -970,6 +1022,7 @@ const Actions = {
     if (downloads) {
       try {
         await downloads.save({ filename, data: backupJson() });
+        BackupReminder.mark();
         toast('Copia descargada');
       } catch (err) {
         toast('No se descargó. Usa “Copiar copia como texto”.');
@@ -981,6 +1034,7 @@ const Actions = {
       a.href = URL.createObjectURL(new Blob([backupJson()], { type: 'application/json' }));
       a.download = filename;
       document.body.appendChild(a); a.click(); a.remove();
+      BackupReminder.mark();
       toast('Si no se descargó, usa “Copiar copia como texto”.');
     } catch (err) {
       toast('No se pudo descargar. Usa “Copiar copia como texto”.');
@@ -989,9 +1043,11 @@ const Actions = {
   'backup-copy': async () => {
     try {
       await navigator.clipboard.writeText(backupJson());
+      BackupReminder.mark();
       toast('Copia copiada. Pégala en Notas o en WhatsApp.');
     } catch (err) {
       app.ui.backupText = backupJson();
+      app.ui.tab = 'ajustes';
       render();
     }
   },
@@ -1001,6 +1057,9 @@ const Actions = {
     askPin('restore', text);
   },
   'reset-all': () => askPin('reset'),
+  'backup-snooze': () => { app.state.settings.backupSnooze = Calendar.today(); commit(); },
+  'backup-every': el => { app.state.settings.backupEvery = Number(el.dataset.n); commit(); },
+  'backup-done': () => { app.ui.backupText = ''; BackupReminder.mark(); toast('Listo, copia registrada'); },
   'pin-change-open': () => { app.ui.sheet = { type: 'pin-change' }; render(); focusSheet(); },
   'pin-create': async () => {
     const error = checkNewPin();

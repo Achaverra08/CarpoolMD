@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cupos: tu guía para empezar</title>
+<link rel="icon" type="image/svg+xml" href="cupos-logo.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFF4F7; --surface: #FFFFFF; --surface-2: #FCE6EE; --line: #F3D6E1; --line-strong: #E6B3C6;
+  --ink: #3B1C2A; --muted: #8A6576; --on-strong: #FFFFFF;
+  --rose: #D63B72; --rose-soft: #FADCE7;
+  --cash: #2E8B64; --cash-soft: #DDF2E8; --nequi: #8B3FB0; --nequi-soft: #F0E0F7; --warn: #C2410C;
+  --font-display: "Bricolage Grotesque", ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+  --font-body: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1A0F15; --surface: #26161F; --surface-2: #33202B; --line: #432837; --line-strong: #5E3A4D;
+    --ink: #FBE8F0; --muted: #C99DB2; --on-strong: #22101A;
+    --rose: #FF7DAA; --rose-soft: #45202F;
+    --cash: #63D3A4; --cash-soft: #1D3A2F; --nequi: #D59CF2; --nequi-soft: #3A2347; --warn: #FFA276;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1A0F15; --surface: #26161F; --surface-2: #33202B; --line: #432837; --line-strong: #5E3A4D;
+  --ink: #FBE8F0; --muted: #C99DB2; --on-strong: #22101A;
+  --rose: #FF7DAA; --rose-soft: #45202F;
+  --cash: #63D3A4; --cash-soft: #1D3A2F; --nequi: #D59CF2; --nequi-soft: #3A2347; --warn: #FFA276;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); -webkit-text-size-adjust: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 var(--font-body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+main { max-width: 620px; margin: 0 auto; padding: 22px 18px 120px; }
+h1, h2 { font-family: var(--font-display); margin: 0; letter-spacing: -0.02em; }
+a { color: var(--rose); font-weight: 700; }
+:focus-visible { outline: 3px solid var(--rose); outline-offset: 2px; }
+.top { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.top svg { width: 60px; height: 60px; flex: none; }
+.top h1 { font-size: 30px; font-weight: 800; line-height: 1.05; }
+.top p { margin: 2px 0 0; color: var(--muted); font-weight: 600; font-size: 15px; }
+.progress { height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; margin-bottom: 8px; }
+.progress span { display: block; height: 100%; width: 0; background: var(--rose); border-radius: 4px; transition: width .25s; }
+.counter { color: var(--muted); font-size: 14px; font-weight: 700; margin: 0 0 16px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 22px 20px; margin-bottom: 16px; }
+.step h2 { font-size: 27px; font-weight: 800; line-height: 1.1; margin-bottom: 12px; }
+.step p { margin: 0 0 12px; }
+.step ol, .step ul { margin: 0 0 12px; padding-left: 22px; }
+.step li { margin-bottom: 8px; }
+.step li::marker { color: var(--rose); font-weight: 800; }
+.note { background: var(--rose-soft); border-radius: 18px; padding: 12px 14px; margin: 14px 0 0; font-size: 15.5px; }
+.note.warn { background: var(--surface-2); border-left: 4px solid var(--warn); }
+.cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--rose); color: var(--on-strong); text-decoration: none; border: 0; border-radius: 16px; padding: 14px 20px; font: 700 17px var(--font-body); min-height: 50px; cursor: pointer; }
+.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line-strong); border-radius: 16px; padding: 12px 18px; font: 700 16px var(--font-body); min-height: 50px; cursor: pointer; }
+.link-box { display: grid; gap: 10px; margin: 6px 0 12px; }
+.link-text { font: 600 15px ui-monospace, Menlo, monospace; background: var(--surface-2); border-radius: 12px; padding: 10px 12px; overflow-wrap: anywhere; }
+.k { display: inline-block; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 8px; padding: 0 7px; font-weight: 700; white-space: nowrap; }
+.share-icon { display: inline-block; width: 18px; height: 18px; vertical-align: -3px; color: var(--rose); }
+
+/* Ilustraciones */
+.mock { background: var(--surface-2); border-radius: 22px; padding: 14px; margin: 6px 0 14px; }
+.sheet-mock { background: var(--surface); border-radius: 16px; overflow: hidden; }
+.sheet-mock div { padding: 12px 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-weight: 600; }
+.sheet-mock div:first-child { border-top: 0; }
+.sheet-mock .hl { background: var(--rose-soft); color: var(--rose); font-weight: 800; }
+.home-mock { display: flex; gap: 18px; justify-content: center; padding: 10px 0 4px; }
+.app-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+.app-tile svg, .app-tile .blank { width: 62px; height: 62px; }
+.app-tile .blank { border-radius: 15px; background: var(--line-strong); opacity: .55; }
+.seats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding-top: 8px; }
+.seat { position: relative; height: 68px; border-radius: 20px 20px 12px 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid transparent; }
+.seat::before { content: ""; position: absolute; top: -8px; left: 30%; right: 30%; height: 10px; border-radius: 6px 6px 3px 3px; background: inherit; border: inherit; border-bottom: 0; }
+.seat b { font: 800 21px/1 var(--font-display); }
+.seat small { font-weight: 700; font-size: 11px; margin-top: 3px; }
+.s-cash { background: var(--cash); color: var(--on-strong); }
+.s-nequi { background: var(--nequi); color: var(--on-strong); }
+.s-debt { background: var(--nequi-soft); color: var(--nequi); border: 2px dashed var(--nequi); }
+.s-free { background: var(--surface); color: var(--muted); border: 2px dashed var(--line-strong); }
+.legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 12px; font-size: 14px; font-weight: 600; color: var(--muted); margin-top: 12px; }
+.example { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+.example strong { font-family: var(--font-display); }
+.tabs-mock { display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); }
+.tabs-mock span.on { color: var(--rose); }
+
+/* Navegación del paso a paso (solo con JavaScript) */
+.nav { display: none; }
+.js .nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); }
+.nav-inner { max-width: 620px; margin: 0 auto; display: flex; gap: 10px; width: 100%; }
+.nav .cta { flex: 1; }
+.nav button:disabled { opacity: .4; }
+.js .progress-wrap { display: block; }
+.progress-wrap { display: none; }
+.index { margin: 0 0 16px; }
+.index summary { cursor: pointer; font-weight: 700; color: var(--rose); padding: 6px 0; }
+.index ol { margin: 8px 0 0; padding-left: 22px; }
+.index button { background: none; border: 0; padding: 4px 0; font: 600 16px var(--font-body); color: var(--ink); text-align: left; cursor: pointer; }
+.index button[aria-current="step"] { color: var(--rose); font-weight: 800; }
+.index { display: none; }
+.js .index { display: block; }
+.end { text-align: center; }
+.end svg { width: 84px; height: 84px; margin: 4px auto 10px; display: block; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 512 512">
+    <rect width="512" height="512" rx="112" fill="#D63B72"/>
+    <rect x="200" y="74" width="112" height="58" rx="24" fill="#FFFFFF"/>
+    <rect x="222" y="126" width="14" height="34" rx="4" fill="#FFFFFF"/>
+    <rect x="276" y="126" width="14" height="34" rx="4" fill="#FFFFFF"/>
+    <path d="M170 196 C170 172 188 156 212 156 L300 156 C324 156 342 172 342 196 L354 330 C356 346 344 356 330 356 L182 356 C168 356 156 346 158 330 Z" fill="#FFFFFF"/>
+    <rect x="116" y="370" width="280" height="74" rx="32" fill="#FFFFFF"/>
+    <path d="M256 300 C213 270 199 247 213 228 C226 212 248 215 256 232 C264 215 286 212 299 228 C313 247 299 270 256 300 Z" fill="#D63B72"/>
+  </symbol>
+  <symbol id="share" viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<main>
+  <header class="top">
+    <svg role="img" aria-label="Logo de Cupos"><use href="#logo"/></svg>
+    <div><h1>Cupos</h1><p>Tu guía para empezar</p></div>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+    <p class="counter" id="counter" aria-live="polite"></p>
+  </div>
+  <details class="index"><summary>Ver todos los pasos</summary><ol id="index"></ol></details>
+
+  <section class="step" data-title="Bienvenida">
+    <h2>Te hice una app para tu carpool</h2>
+    <p>Se llama <strong>Cupos</strong>. Con ella llevas el control de tus viajes de subida y bajada, quién te pagó en efectivo o por Nequi, quién te debe, tus gastos del carro y tus metas de ahorro.</p>
+    <p>Lo mejor: te dice cuántos pasajeros necesitas por trayecto para cumplir tus metas a tiempo.</p>
+    <div class="note">Tus datos se guardan solo en tu celular. Nadie más los ve, ni siquiera yo. No necesitas crear cuentas ni iniciar sesión.</div>
+  </section>
+
+  <section class="step" data-title="Abre el link">
+    <h2>Abre el link en Safari</h2>
+    <div class="link-box">
+      <a class="cta" href="https://achaverra08.github.io/CarpoolMD/">Abrir Cupos</a>
+      <span class="link-text">https://achaverra08.github.io/CarpoolMD/</span>
+    </div>
+    <p>Tiene que ser en <strong>Safari</strong>, el navegador de la brújula azul.</p>
+    <div class="note warn">Si el link se abre dentro de WhatsApp, busca el ícono de la brújula o la opción <span class="k">Abrir en Safari</span> para pasarlo a Safari.</div>
+  </section>
+
+  <section class="step" data-title="Conviértela en app">
+    <h2>Ponla como app en tu pantalla de inicio</h2>
+    <ol>
+      <li>Con Cupos abierto en Safari, toca el botón <strong>Compartir</strong> <svg class="share-icon" aria-hidden="true"><use href="#share"/></svg>. En el iPhone está abajo (a veces dentro de los tres puntos <span class="k">···</span>); en el iPad, arriba a la derecha.</li>
+      <li>Baja en la lista y toca <strong>Agregar a pantalla de inicio</strong>.</li>
+      <li>Si aparece la opción <strong>Abrir como app web</strong>, déjala activada.</li>
+      <li>Deja el nombre <strong>Cupos</strong> y toca <strong>Agregar</strong>.</li>
+    </ol>
+    <div class="mock" aria-hidden="true">
+      <div class="sheet-mock">
+        <div><span>Copiar</span></div>
+        <div><span>Agregar a favoritos</span></div>
+        <div class="hl"><span>Agregar a pantalla de inicio</span><span>＋</span></div>
+      </div>
+    </div>
+    <p>Te queda este ícono en la pantalla, como cualquier otra app:</p>
+    <div class="mock home-mock" aria-hidden="true">
+      <div class="app-tile"><span class="blank"></span><span>Fotos</span></div>
+      <div class="app-tile"><svg><use href="#logo"/></svg><span>Cupos</span></div>
+      <div class="app-tile"><span class="blank"></span><span>Nequi</span></div>
+    </div>
+  </section>
+
+  <section class="step" data-title="Siempre desde el ícono">
+    <h2>Ábrela siempre desde el ícono</h2>
+    <p>Desde ahora, entra a Cupos <strong>solo tocando el ícono</strong>, no desde Safari.</p>
+    <p>El ícono y Safari guardan los datos en lugares distintos. Si un día la abres por Safari, la verás vacía y pensarás que se borró todo. No se borró: está en el ícono.</p>
+    <div class="note warn">Nunca borres el ícono de la pantalla de inicio. En el iPhone, borrar una app web borra también sus datos.</div>
+  </section>
+
+  <section class="step" data-title="Crea tu clave">
+    <h2>Crea tu clave</h2>
+    <p>La primera vez que abras Cupos te va a pedir crear una clave de mínimo 4 caracteres.</p>
+    <p>La clave protege las dos cosas que pueden borrar tu información: <strong>borrar todos los datos</strong> y <strong>restaurar una copia</strong>. Para todo lo demás no se pide.</p>
+    <div class="note">Anótala en un lugar seguro, por ejemplo en Notas. Si la olvidas no se puede recuperar, aunque la app sigue funcionando normal.</div>
+  </section>
+
+  <section class="step" data-title="Configura tus datos">
+    <h2>Configura tus tarifas y días</h2>
+    <p>Abajo hay cinco pestañas:</p>
+    <div class="mock tabs-mock" aria-hidden="true"><span>Hoy</span><span>Semana</span><span>Metas</span><span>Gastos</span><span class="on">Ajustes</span></div>
+    <p>Entra a <strong>Ajustes</strong> y llena esto una sola vez:</p>
+    <ul>
+      <li><strong>Tarifa por pasajero</strong> de subida y de bajada. Es el valor que aparece por defecto cada día.</li>
+      <li><strong>Días que trabajas</strong>: marca tus 4 días. Las metas se calculan solo con ellos.</li>
+      <li>Si quieres, cambia los nombres <em>Subida</em> y <em>Bajada</em> por los que uses tú.</li>
+    </ul>
+  </section>
+
+  <section class="step" data-title="Registra pasajeros">
+    <h2>Registra a tus pasajeros</h2>
+    <p>En <strong>Hoy</strong> ves dos trayectos, cada uno con tus 4 cupos:</p>
+    <div class="mock" aria-hidden="true">
+      <div class="seats">
+        <div class="seat s-cash"><b>$</b><small>$5 mil</small></div>
+        <div class="seat s-nequi"><b>N</b><small>$5 mil</small></div>
+        <div class="seat s-debt"><b>L</b><small>Debe</small></div>
+        <div class="seat s-free"><b>+</b><small>Libre</small></div>
+      </div>
+      <div class="legend"><span>Verde: efectivo</span><span>Morado: Nequi</span><span>Punteado: te debe</span><span>Gris: cupo libre</span></div>
+    </div>
+    <ol>
+      <li>Toca un <strong>cupo libre</strong> por cada pasajero que se sube.</li>
+      <li>Elige <strong>Efectivo</strong> o <strong>Nequi</strong>, y si <strong>Pagó</strong> o <strong>Debe</strong>.</li>
+      <li>Si quieres, escribe su nombre o apodo. Su inicial aparece en el asiento.</li>
+      <li>Toca <strong>Listo</strong>. Para corregir, toca otra vez el asiento; para borrarlo, <strong>Quitar pasajero</strong>.</li>
+    </ol>
+    <p>Si alguien paga distinto, apaga <strong>Todos pagan lo mismo</strong> y pon el valor de cada uno.</p>
+    <div class="note">Con las flechas de arriba, o tocando la fecha, puedes ir a otros días para registrar o corregir.</div>
+  </section>
+
+  <section class="step" data-title="Por cobrar">
+    <h2>Lleva la cuenta de quién te debe</h2>
+    <p>Al final de <strong>Hoy</strong> aparece la lista <strong>Por cobrar</strong> con todos los que te deben, de cualquier día.</p>
+    <p>Cuando alguien te pague, toca <strong>Ya pagó</strong> y sale de la lista.</p>
+    <div class="note">Lo que te deben no cuenta para tus metas hasta que lo marques como pagado.</div>
+  </section>
+
+  <section class="step" data-title="Tu semana">
+    <h2>Mira cómo te fue en la semana</h2>
+    <p>En <strong>Semana</strong> tienes la tabla por días con pasajeros de subida y bajada, lo cobrado en efectivo y en Nequi, y los totales.</p>
+    <ul>
+      <li>Abajo ves el total de la semana, lo que te deben, tus gastos y lo que te queda.</li>
+      <li>Hay dos gráficas: lo que cobraste cada día y tus últimas 8 semanas.</li>
+      <li>Con las flechas ves semanas pasadas. Si tocas un día de la tabla, te lleva a ese día para corregirlo.</li>
+    </ul>
+  </section>
+
+  <section class="step" data-title="Gastos">
+    <h2>Anota tus gastos</h2>
+    <p>En <strong>Gastos</strong> eliges el concepto (gasolina, peaje, parqueadero, mantenimiento, lavado u otro), la fecha y el valor, y tocas <strong>Agregar gasto</strong>.</p>
+    <p>No tienes que hacerlo todos los días, solo cuando gastes. Los gastos se restan de lo que cobras para calcular tus metas.</p>
+  </section>
+
+  <section class="step" data-title="Metas">
+    <h2>Crea tus metas de ahorro</h2>
+    <p>En <strong>Metas</strong> toca <strong>Nueva meta</strong> y llena:</p>
+    <ul>
+      <li><strong>Cuánto quieres ahorrar</strong> y para <strong>qué fecha</strong>.</li>
+      <li><strong>Qué porcentaje</strong> de lo que te queda va para esa meta.</li>
+    </ul>
+    <div class="mock">
+      <p style="margin:0 0 8px;font-weight:700">Ejemplo</p>
+      <div class="example">
+        <span>Cobraste en la semana</span><strong>$200.000</strong>
+        <span>Gastaste</span><strong>−$50.000</strong>
+        <span>Te queda</span><strong>$150.000</strong>
+        <span>Tu meta tiene 30 %, así que ahorra</span><strong>$45.000</strong>
+      </div>
+    </div>
+    <p>Arriba la app te dice cuántos pasajeros necesitas <strong>como mínimo por trayecto</strong> para cumplir todas tus metas a tiempo, y te avisa si ni con los 4 cupos alcanzas.</p>
+    <div class="note">Puedes tener varias metas a la vez. Procura que sus porcentajes no sumen más de 100 %.</div>
+  </section>
+
+  <section class="step" data-title="Copias de seguridad">
+    <h2>Haz tu copia de seguridad</h2>
+    <p>Como tus datos viven solo en tu celular, si lo pierdes o borras el ícono, se pierden. La copia te protege.</p>
+    <ol>
+      <li>Cada cierto tiempo te aparece un <strong>aviso rosado</strong> en Hoy.</li>
+      <li>Toca <strong>Copiar copia ahora</strong>.</li>
+      <li>Abre tu chat de WhatsApp contigo misma (o Notas) y <strong>pega</strong>. Se ve como un texto raro: es normal, así se guarda.</li>
+    </ol>
+    <p>Si algún día necesitas recuperar todo: copia ese texto, ve a <strong>Ajustes → Restaurar copia pegada</strong>, pégalo y escribe tu clave.</p>
+    <div class="note">En Ajustes puedes elegir cada cuánto te recuerda: 3, 7 o 15 días.</div>
+  </section>
+
+  <section class="step" data-title="Y el iPad">
+    <h2>¿Y en el iPad?</h2>
+    <p>Puedes instalarla igual, con los pasos 2 al 5. Pero por ahora <strong>el iPad y el iPhone no se sincronizan solos</strong>: cada uno guarda sus propios datos.</p>
+    <p>Lo mejor es usar el <strong>iPhone como principal</strong> y registrar ahí tus viajes. Si quieres ver todo en el iPad:</p>
+    <ol>
+      <li>En el iPhone: <strong>Ajustes → Copiar copia como texto</strong>.</li>
+      <li>Envíatelo por WhatsApp y cópialo en el iPad.</li>
+      <li>En el iPad: <strong>Ajustes → Restaurar copia pegada</strong>, y tu clave del iPad.</li>
+    </ol>
+    <div class="note warn">Restaurar reemplaza lo que haya en el iPad. Por eso conviene registrar solo en el iPhone.</div>
+  </section>
+
+  <section class="step end" data-title="Lo que viene">
+    <svg role="img" aria-label="Logo de Cupos"><use href="#logo"/></svg>
+    <h2>Lo que viene</h2>
+    <p>Mi próximo paso es que <strong>tu iPhone y tu iPad muestren la misma información automáticamente</strong>: lo que registres en uno aparecerá en el otro, sin copiar ni pegar y sin crear cuentas.</p>
+    <p>Mientras tanto, usa el iPhone como principal y haz tus copias cuando salga el aviso. Así, cuando esté lista la nueva versión, tus datos pasan completos.</p>
+    <p>Cualquier cosa que quieras cambiar o agregar, me dices. ¡Buenos viajes!</p>
+    <a class="cta" href="https://achaverra08.github.io/CarpoolMD/">Abrir Cupos</a>
+  </section>
+</main>
+
+<nav class="nav" aria-label="Pasos">
+  <div class="nav-inner">
+    <button class="ghost" id="prev" type="button">Anterior</button>
+    <button class="cta" id="next" type="button">Siguiente</button>
+  </div>
+</nav>
+
+<script>
+(() => {
+  document.documentElement.classList.add('js');
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const bar = document.getElementById('bar');
+  const counter = document.getElementById('counter');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const index = document.getElementById('index');
+  let current = 0;
+
+  index.innerHTML = steps.map((s, i) => `<li><button type="button" data-go="${i}">${s.dataset.title}</button></li>`).join('');
+
+  const show = n => {
+    current = Math.max(0, Math.min(steps.length - 1, n));
+    steps.forEach((s, i) => { s.hidden = i !== current; });
+    bar.style.width = `${((current + 1) / steps.length) * 100}%`;
+    counter.textContent = `Paso ${current + 1} de ${steps.length}`;
+    prev.disabled = current === 0;
+    next.textContent = current === steps.length - 1 ? 'Volver al inicio' : 'Siguiente';
+    index.querySelectorAll('button').forEach((b, i) => { b.toggleAttribute('aria-current', i === current); if (i === current) b.setAttribute('aria-current', 'step'); });
+    window.scrollTo(0, 0);
+  };
+
+  prev.addEventListener('click', () => show(current - 1));
+  next.addEventListener('click', () => show(current === steps.length - 1 ? 0 : current + 1));
+  index.addEventListener('click', e => {
+    const b = e.target.closest('[data-go]');
+    if (!b) return;
+    index.closest('details').open = false;
+    show(Number(b.dataset.go));
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') show(current + 1);
+    if (e.key === 'ArrowLeft') show(current - 1);
+  });
+  show(0);
+})();
+</script>
+</body>
+</html>
