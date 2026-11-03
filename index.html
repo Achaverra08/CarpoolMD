@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cupos">
+<title>Cupos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFF4F7; --surface: #FFFFFF; --surface-2: #FCE6EE; --line: #F3D6E1; --line-strong: #E6B3C6;
+  --ink: #3B1C2A; --muted: #8A6576; --on-strong: #FFFFFF;
+  --rose: #D63B72; --rose-soft: #FADCE7;
+  --cash: #2E8B64; --cash-soft: #DDF2E8;
+  --nequi: #8B3FB0; --nequi-soft: #F0E0F7;
+  --warn: #C2410C; --warn-soft: #FDE8DC;
+  --font-display: "Bricolage Grotesque", ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+  --font-body: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1A0F15; --surface: #26161F; --surface-2: #33202B; --line: #432837; --line-strong: #5E3A4D;
+    --ink: #FBE8F0; --muted: #C99DB2; --on-strong: #22101A;
+    --rose: #FF7DAA; --rose-soft: #45202F;
+    --cash: #63D3A4; --cash-soft: #1D3A2F;
+    --nequi: #D59CF2; --nequi-soft: #3A2347;
+    --warn: #FFA276; --warn-soft: #45261A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1A0F15; --surface: #26161F; --surface-2: #33202B; --line: #432837; --line-strong: #5E3A4D;
+  --ink: #FBE8F0; --muted: #C99DB2; --on-strong: #22101A;
+  --rose: #FF7DAA; --rose-soft: #45202F;
+  --cash: #63D3A4; --cash-soft: #1D3A2F;
+  --nequi: #D59CF2; --nequi-soft: #3A2347;
+  --warn: #FFA276; --warn-soft: #45261A;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font-body); -webkit-tap-highlight-color: transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--rose); outline-offset: 2px; }
+main { max-width: 720px; margin: 0 auto; padding: 18px 16px 110px; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+.view-title { font-weight: 800; font-size: clamp(30px, 8vw, 40px); line-height: 1.05; letter-spacing: -0.02em; margin: 6px 0 14px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 28px 0 8px; }
+.section-head h2 { font-size: 21px; font-weight: 700; }
+.muted { color: var(--muted); font-size: 14px; }
+.lede { max-width: 46ch; color: var(--muted); margin: 0 0 16px; }
+.banner { background: var(--warn-soft); color: var(--warn); padding: 10px 14px; border-radius: 14px; margin-bottom: 14px; font-weight: 600; }
+
+/* Botones e inputs */
+.primary, .ghost, .small { border-radius: 14px; font-weight: 700; padding: 12px 18px; border: 1.5px solid transparent; min-height: 46px; }
+.primary { background: var(--rose); color: var(--on-strong); }
+.ghost { background: transparent; border-color: var(--line-strong); }
+.ghost.danger { color: var(--warn); border-color: var(--warn); }
+.small { padding: 8px 12px; min-height: 38px; font-size: 14px; background: var(--rose-soft); color: var(--rose); }
+.armed, .ghost.danger.armed { background: var(--warn); color: var(--on-strong); border-color: var(--warn); }
+.primary.danger-fill { background: var(--warn); }
+.icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--surface-2); display: grid; place-items: center; flex: none; }
+.icon-btn svg { width: 22px; height: 22px; }
+.link { border: 0; background: none; color: var(--rose); font-weight: 700; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+.text, .money, .field input, .field textarea { width: 100%; font: 16px var(--font-body); color: var(--ink); background: var(--surface); border: 1.5px solid var(--line-strong); border-radius: 14px; padding: 11px 14px; min-height: 46px; }
+.field input[type="date"] { -webkit-appearance: none; appearance: none; display: block; }
+.money { display: flex; align-items: center; gap: 4px; padding: 0 14px; }
+.money > span { color: var(--muted); font-weight: 700; }
+.money input { border: 0; outline: 0; background: transparent; font: 600 16px var(--font-body); color: var(--ink); width: 100%; padding: 11px 0; min-height: 44px; }
+.money:focus-within, .text:focus { outline: 3px solid var(--rose-soft); border-color: var(--rose); }
+.field { display: grid; gap: 6px; margin-bottom: 12px; }
+.field > span { font-weight: 600; font-size: 14px; color: var(--muted); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-btn { border: 1.5px solid var(--line-strong); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 15px; min-height: 40px; }
+.chip-btn.on { background: var(--rose); border-color: var(--rose); color: var(--on-strong); }
+.check { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; cursor: pointer; }
+.check input { appearance: none; -webkit-appearance: none; width: 46px; height: 28px; border-radius: 14px; background: var(--line-strong); position: relative; margin: 0; flex: none; transition: background .15s; }
+.check input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.check input:checked { background: var(--rose); }
+.check input:checked::after { transform: translateX(18px); }
+
+/* Hoy */
+.day-nav { display: flex; align-items: center; gap: 8px; }
+.date-label { position: relative; flex: 1; text-align: center; min-width: 0; }
+.date-title { display: block; font: 800 clamp(26px, 7.4vw, 40px)/1.05 var(--font-display); letter-spacing: -0.02em; }
+.date-label input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; font-size: 16px; cursor: pointer; }
+.day-meta { text-align: center; color: var(--muted); margin: 6px 0 0; font-weight: 600; display: flex; justify-content: center; gap: 10px; align-items: center; }
+.tag { background: var(--rose-soft); color: var(--rose); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 700; }
+.day-sentence { text-align: center; margin: 12px auto 20px; max-width: 34ch; font-size: 17px; }
+.trip { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: 16px; margin-bottom: 14px; }
+.trip-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px; }
+.trip-head h2 { font-size: 23px; font-weight: 700; }
+.trip-count { color: var(--muted); font-size: 14px; font-weight: 600; }
+.trip-sum { margin-left: auto; font: 700 19px var(--font-display); }
+.seats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.seat { position: relative; appearance: none; height: 82px; border: 2px solid transparent; border-radius: 24px 24px 14px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 0; }
+.seat::before { content: ""; position: absolute; top: -9px; left: 30%; right: 30%; height: 11px; border-radius: 7px 7px 3px 3px; background: inherit; border: inherit; border-bottom: 0; }
+.seat-glyph { font: 800 26px/1 var(--font-display); }
+.seat-sub { font: 700 12px/1.3 var(--font-body); margin-top: 4px; }
+.seat.is-empty { background: var(--surface-2); color: var(--muted); border: 2px dashed var(--line-strong); }
+.seat.m-efectivo { background: var(--cash); color: var(--on-strong); }
+.seat.m-nequi { background: var(--nequi); color: var(--on-strong); }
+.seat.is-pending.m-efectivo { background: var(--cash-soft); color: var(--cash); border: 2px dashed var(--cash); }
+.seat.is-pending.m-nequi { background: var(--nequi-soft); color: var(--nequi); border: 2px dashed var(--nequi); }
+.seat.is-selected { outline: 3px solid var(--rose); outline-offset: 4px; }
+.seat-editor { margin-top: 14px; background: var(--surface-2); border-radius: 20px; padding: 12px; display: grid; gap: 10px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--bg); border-radius: 14px; padding: 4px; gap: 4px; }
+.seg button { border: 0; background: none; padding: 10px; border-radius: 10px; font-weight: 600; font-size: 15px; min-height: 42px; }
+.seg button.on { background: var(--rose); color: var(--on-strong); }
+.seg button.on.m-efectivo { background: var(--cash); }
+.seg button.on.m-nequi { background: var(--nequi); }
+.seg button.on.is-debt { background: var(--warn); }
+.editor-actions { display: flex; gap: 10px; justify-content: space-between; }
+.fare-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.fare-row .money { flex: 1; min-width: 140px; }
+.hint { color: var(--muted); font-size: 14px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: 13px; font-weight: 600; margin: 4px 4px 0; }
+.dot { display: inline-block; width: 11px; height: 11px; border-radius: 4px; margin-right: 6px; vertical-align: -1px; }
+.dot.cash { background: var(--cash); } .dot.nequi { background: var(--nequi); } .dot.debt { border: 2px dashed var(--muted); }
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.rows li > div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.amt { font: 700 17px var(--font-display); white-space: nowrap; }
+.month-head { display: flex; justify-content: space-between; font-weight: 700; margin: 18px 0 2px; }
+
+/* Semana */
+.week-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.week-nav > div { flex: 1; text-align: center; }
+.week-nav .view-title { margin: 0; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; min-width: 330px; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { padding: 11px 12px; text-align: right; white-space: nowrap; }
+@media (max-width: 480px) { table { font-size: 14px; } th, td { padding: 10px 7px; } th:first-child, td:first-child { padding-left: 12px; } th:last-child, td:last-child { padding-right: 12px; } }
+th:first-child, td:first-child { text-align: left; }
+thead th { color: var(--muted); font-weight: 600; font-size: 13px; border-bottom: 1px solid var(--line); }
+tbody tr + tr td { border-top: 1px solid var(--line); }
+tfoot td { font-weight: 700; border-top: 2px solid var(--line-strong); }
+tr.is-off td { color: var(--muted); }
+.row-day { background: none; border: 0; color: var(--rose); font-weight: 700; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+.figures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; margin: 14px 0; }
+.figure { background: var(--surface); padding: 12px 14px; }
+.figure span { display: block; color: var(--muted); font-size: 13px; font-weight: 600; }
+.figure strong { font: 700 20px var(--font-display); }
+.figure.lead { grid-column: 1 / -1; background: var(--rose-soft); }
+.figure.lead strong { font-size: 34px; color: var(--rose); }
+.figure.neg strong { color: var(--warn); }
+@media (min-width: 600px) { .figures { grid-template-columns: repeat(3, 1fr); } }
+.chart { width: 100%; height: auto; display: block; max-width: 620px; }
+.chart .c-cash { fill: var(--cash); } .chart .c-nequi { fill: var(--nequi); } .chart .c-rose { fill: var(--rose); }
+.chart .base { stroke: var(--line-strong); stroke-width: 1; }
+.chart .lab { fill: var(--muted); font: 600 10px var(--font-body); text-anchor: middle; }
+.chart .lab.hi { fill: var(--ink); font-weight: 800; }
+.chart .val { fill: var(--ink); font: 700 9px var(--font-body); text-anchor: middle; }
+.chart-empty { color: var(--muted); padding: 18px 0; }
+
+/* Metas */
+.overview { background: var(--rose-soft); border-radius: 28px; padding: 18px; margin-bottom: 8px; }
+.overview p { margin: 0 0 8px; }
+.big-line { font: 700 22px/1.25 var(--font-display); }
+.mini-seats { display: flex; gap: 8px; margin: 14px 0 12px; }
+.mini-seat { width: 36px; height: 42px; border-radius: 14px 14px 8px 8px; background: var(--surface); border: 2px dashed var(--rose); }
+.mini-seat.on { background: var(--rose); border-style: solid; }
+.mini-seat.over { background: var(--warn); border: 2px solid var(--warn); }
+.goal { border-top: 1px solid var(--line); padding: 18px 0; }
+.goal-head { display: flex; align-items: center; gap: 10px; }
+.goal-head h3 { font-size: 21px; font-weight: 700; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.goal-amounts { margin: 8px 0; font-size: 15px; }
+.goal-amounts strong { font: 700 24px var(--font-display); }
+.bar { height: 12px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--rose); border-radius: 6px; }
+.goal.is-done .bar span { background: var(--cash); }
+.goal-meta { color: var(--muted); font-size: 14px; margin: 8px 0 4px; }
+.goal-plan { margin: 6px 0 0; max-width: 52ch; }
+.goal-plan.is-tight { color: var(--warn); font-weight: 600; }
+
+/* Barra de pestañas */
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
+.tabbar-inner { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+.tab { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; border: 0; background: none; color: var(--muted); font-weight: 600; font-size: 11px; line-height: 1.2; border-radius: 12px; }
+.tab svg { width: 24px; height: 24px; }
+.tab[aria-current="page"] { color: var(--rose); }
+
+/* Hoja inferior y avisos */
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(40, 10, 25, .45); z-index: 40; display: flex; align-items: flex-end; justify-content: center; }
+.sheet { background: var(--surface); width: 100%; max-width: 560px; border-radius: 28px 28px 0 0; padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px)); max-height: 92%; overflow: auto; }
+.sheet h2 { font-size: 24px; margin-bottom: 14px; }
+.sheet-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.sheet-actions .primary { flex: 1; }
+.form-error { color: var(--warn); font-weight: 600; min-height: 1.5em; margin: 0 0 6px; }
+@media (min-width: 700px) { .sheet-backdrop { align-items: center; } .sheet { border-radius: 28px; } }
+.toast { position: fixed; left: 50%; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 14px; font-weight: 600; z-index: 50; width: max-content; max-width: 90vw; text-align: center; }
+.toast[hidden] { display: none; }
+textarea.backup { width: 100%; min-height: 110px; font: 13px/1.4 ui-monospace, Menlo, monospace; border: 1.5px solid var(--line-strong); border-radius: 14px; padding: 10px; background: var(--surface); color: var(--ink); }
+.stack { display: grid; gap: 10px; }
+.empty { text-align: center; padding: 28px 12px; color: var(--muted); }
+@media (min-width: 760px) { main { padding-top: 28px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main id="view" aria-live="polite"></main>
+<nav class="tabbar" aria-label="Secciones"><div class="tabbar-inner" id="tabs"></div></nav>
+<div id="sheet-root"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+'use strict';
+
+/* ================= Formato ================= */
+const pad = n => String(n).padStart(2, '0');
+const COP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0, minimumFractionDigits: 0 });
+const DIGITS = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+const money = n => COP.format(Math.round(n || 0));
+const moneyInput = n => (n ? DIGITS.format(n) : '');
+const parseMoney = s => Number(String(s ?? '').replace(/[^\d]/g, '')) || 0;
+const decimal1 = n => n.toLocaleString('es-CO', { maximumFractionDigits: 1 });
+const compactMoney = n => {
+  if (n >= 1e6) return `$${decimal1(n / 1e6)} M`;
+  if (n >= 1000) return `$${decimal1(n / 1000)} mil`;
+  return `$${Math.round(n)}`;
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+/* ================= Calendario ================= */
+const DAY_NAMES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const DAY_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const Calendar = {
+  key: d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`,
+  date: k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); },
+  today: () => Calendar.key(new Date()),
+  add: (k, n) => { const d = Calendar.date(k); d.setDate(d.getDate() + n); return Calendar.key(d); },
+  weekday: k => Calendar.date(k).getDay(),
+  monday: k => Calendar.add(k, -((Calendar.weekday(k) + 6) % 7)),
+  isValid: k => /^\d{4}-\d{2}-\d{2}$/.test(k || ''),
+  isoWeek: k => {
+    const d0 = Calendar.date(k);
+    const d = new Date(Date.UTC(d0.getFullYear(), d0.getMonth(), d0.getDate()));
+    const day = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - day);
+    const y0 = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil(((d - y0) / 86400000 + 1) / 7);
+  },
+  long: k => { const d = Calendar.date(k); return `${DAY_NAMES[d.getDay()]} ${d.getDate()} de ${MONTHS[d.getMonth()]}`; },
+  short: k => { const d = Calendar.date(k); return `${DAY_SHORT[d.getDay()]} ${d.getDate()}`; },
+  dayMonth: k => {
+    const d = Calendar.date(k);
+    const year = d.getFullYear() !== new Date().getFullYear() ? ` de ${d.getFullYear()}` : '';
+    return `${d.getDate()} de ${MONTHS[d.getMonth()]}${year}`;
+  },
+  monthName: k => { const d = Calendar.date(k); return `${cap(MONTHS[d.getMonth()])} ${d.getFullYear()}`; },
+};
+
+/* ================= Persistencia ================= */
+const STORAGE_KEY = 'cupos-carpool-v1';
+const defaultState = () => ({
+  version: 1,
+  settings: { labels: { subida: 'Subida', bajada: 'Bajada' }, fares: { subida: 0, bajada: 0 }, workDays: [1, 2, 3, 4], lastMethod: 'efectivo', pinHash: '' },
+  trips: {},
+  expenses: [],
+  goals: [],
+});
+const normalizeState = data => {
+  const base = defaultState();
+  if (!data || typeof data !== 'object') return base;
+  const s = data.settings || {};
+  return {
+    version: 1,
+    settings: {
+      ...base.settings, ...s,
+      labels: { ...base.settings.labels, ...(s.labels || {}) },
+      fares: { ...base.settings.fares, ...(s.fares || {}) },
+      workDays: Array.isArray(s.workDays) ? s.workDays : base.settings.workDays,
+    },
+    trips: data.trips && typeof data.trips === 'object' ? data.trips : {},
+    expenses: Array.isArray(data.expenses) ? data.expenses : [],
+    goals: Array.isArray(data.goals) ? data.goals : [],
+  };
+};
+const CarpoolStore = {
+  available: true,
+  load: () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? normalizeState(JSON.parse(raw)) : defaultState();
+    } catch (err) {
+      CarpoolStore.available = false;
+      return defaultState();
+    }
+  },
+  save: state => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      CarpoolStore.available = true;
+    } catch (err) {
+      CarpoolStore.available = false;
+    }
+  },
+};
+
+/* ================= Dominio: viajes y cobros ================= */
+const DIRECTIONS = ['subida', 'bajada'];
+const MAX_SEATS = 4;
+const METHODS = { efectivo: 'Efectivo', nequi: 'Nequi' };
+const Ledger = {
+  fare: (trip, p) => (trip.samePrice ? (trip.price || 0) : (p.amount || 0)),
+  trip: (state, key, dir) => state.trips[key]?.[dir] || null,
+  ensureTrip: (state, key, dir) => {
+    state.trips[key] = state.trips[key] || {};
+    state.trips[key][dir] = state.trips[key][dir] || { samePrice: true, price: state.settings.fares[dir] || 0, passengers: [] };
+    return state.trips[key][dir];
+  },
+  emptyTally: () => ({ subida: 0, bajada: 0, passengers: 0, efectivo: 0, nequi: 0, pending: 0, billed: 0 }),
+  addTrip: (tally, dir, trip) => {
+    trip.passengers.forEach(p => {
+      const fare = Ledger.fare(trip, p);
+      tally[dir] += 1; tally.passengers += 1; tally.billed += fare;
+      if (!p.paid) { tally.pending += fare; return; }
+      tally[p.method] += fare;
+    });
+    return tally;
+  },
+  rangeTally: (state, from, to) => Object.keys(state.trips)
+    .filter(k => k >= from && k <= to)
+    .reduce((tally, key) => {
+      DIRECTIONS.forEach(dir => { const trip = state.trips[key][dir]; if (trip) Ledger.addTrip(tally, dir, trip); });
+      return tally;
+    }, Ledger.emptyTally()),
+  dayTally: (state, key) => Ledger.rangeTally(state, key, key),
+  collected: t => t.efectivo + t.nequi,
+  expensesBetween: (state, from, to) => state.expenses.filter(e => e.date >= from && e.date <= to).reduce((s, e) => s + e.amount, 0),
+  pendingList: state => {
+    const out = [];
+    Object.keys(state.trips).sort().reverse().forEach(key => DIRECTIONS.forEach(dir => {
+      const trip = state.trips[key][dir];
+      if (!trip) return;
+      trip.passengers.forEach((p, index) => { if (!p.paid) out.push({ key, dir, index, passenger: p, amount: Ledger.fare(trip, p) }); });
+    }));
+    return out;
+  },
+  eachPassenger: (state, from, to, fn) => Object.keys(state.trips).filter(k => k >= from && k <= to).forEach(key => DIRECTIONS.forEach(dir => {
+    const trip = state.trips[key][dir];
+    if (trip) fn(trip, key, dir);
+  })),
+};
+
+/* ================= Dominio: metas ================= */
+const GoalPlanner = {
+  isWorkDay: (state, key) => state.settings.workDays.includes(Calendar.weekday(key)),
+  countWorkDays: (state, from, to) => {
+    let n = 0;
+    for (let k = from; k <= to; k = Calendar.add(k, 1)) if (GoalPlanner.isWorkDay(state, k)) n++;
+    return n;
+  },
+  averageFare: state => {
+    const today = Calendar.today();
+    let sum = 0, n = 0;
+    Ledger.eachPassenger(state, Calendar.add(today, -60), today, trip => trip.passengers.forEach(p => {
+      const f = Ledger.fare(trip, p);
+      if (f > 0) { sum += f; n++; }
+    }));
+    if (n >= 4) return sum / n;
+    const defaults = DIRECTIONS.map(d => state.settings.fares[d]).filter(f => f > 0);
+    if (defaults.length) return defaults.reduce((a, b) => a + b, 0) / defaults.length;
+    return n ? sum / n : 0;
+  },
+  expensePerWorkDay: state => {
+    const to = Calendar.today();
+    const from = Calendar.add(to, -27);
+    const days = GoalPlanner.countWorkDays(state, from, to);
+    return days ? Ledger.expensesBetween(state, from, to) / days : 0;
+  },
+  recentPace: state => {
+    const to = Calendar.today();
+    let trips = 0, pax = 0;
+    Ledger.eachPassenger(state, Calendar.add(to, -13), to, trip => {
+      if (!trip.passengers.length) return;
+      trips++; pax += trip.passengers.length;
+    });
+    return trips ? pax / trips : null;
+  },
+  plan: (state, goal, today) => {
+    const pct = goal.pct / 100;
+    const net = Ledger.collected(Ledger.rangeTally(state, goal.start, '9999-12-31')) - Ledger.expensesBetween(state, goal.start, '9999-12-31');
+    const saved = Math.max(0, net) * pct;
+    const remaining = Math.max(0, goal.target - saved);
+    const base = { goal, saved, remaining, progress: goal.target ? Math.min(1, saved / goal.target) : 0 };
+    if (remaining <= 0) return { ...base, status: 'done' };
+    if (goal.deadline < today) return { ...base, status: 'overdue' };
+    const firstDay = Ledger.dayTally(state, today).passengers > 0 ? Calendar.add(today, 1) : today;
+    const days = GoalPlanner.countWorkDays(state, firstDay, goal.deadline);
+    if (!days) return { ...base, status: 'nodays' };
+    const fare = GoalPlanner.averageFare(state);
+    if (!fare) return { ...base, status: 'nofare', days };
+    const trips = days * DIRECTIONS.length;
+    const projectedExpenses = GoalPlanner.expensePerWorkDay(state) * days;
+    const neededIncome = remaining / pct + projectedExpenses;
+    const passengersTotal = Math.ceil(neededIncome / fare);
+    const perTrip = passengersTotal / trips;
+    const plan = { ...base, days, trips, fare, passengersTotal, perTrip, minPerTrip: Math.max(1, Math.ceil(perTrip - 1e-9)) };
+    if (perTrip <= MAX_SEATS) return { ...plan, status: 'ok' };
+    const reach = saved + Math.max(0, trips * MAX_SEATS * fare - projectedExpenses) * pct;
+    return { ...plan, status: 'tight', reach };
+  },
+  summarize: plans => {
+    const open = plans.filter(p => p.status === 'ok' || p.status === 'tight');
+    if (!open.length) return null;
+    const worst = open.reduce((a, b) => (b.perTrip > a.perTrip ? b : a));
+    return { worst, minPerTrip: worst.minPerTrip, tight: worst.status === 'tight' };
+  },
+};
+
+/* ================= Estado de la app ================= */
+const app = {
+  state: CarpoolStore.load(),
+  ui: { tab: 'hoy', day: Calendar.today(), week: Calendar.monday(Calendar.today()), sel: null, sheet: null, concept: 'Gasolina', backupText: '', pendingRestore: '' },
+};
+const label = dir => app.state.settings.labels[dir] || cap(dir);
+const hashPin = async pin => {
+  const data = new TextEncoder().encode(`cupos:${pin}`);
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  let h = 5381;
+  data.forEach(b => { h = ((h << 5) + h + b) >>> 0; });
+  return `d${h.toString(16)}`;
+};
+let renderTimer = 0;
+const save = () => CarpoolStore.save(app.state);
+const commit = () => { save(); render(); };
+const scheduleRender = () => { clearTimeout(renderTimer); renderTimer = setTimeout(render, 160); };
+let toastTimer = 0;
+const toast = msg => {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 3200);
+};
+
+/* ================= Iconos ================= */
+const svgIcon = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const Icons = {
+  hoy: svgIcon('<path d="M8 3h6a3 3 0 0 1 3 3v7H10a2 2 0 0 1-2-2z"/><path d="M5 13h14v4H5z"/><path d="M7 17v3M17 17v3"/>'),
+  semana: svgIcon('<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+  metas: svgIcon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'),
+  gastos: svgIcon('<path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h14M7 8h6"/><path d="M15 10h2a2 2 0 0 1 2 2v4a1.5 1.5 0 0 0 3 0V9l-3-3"/>'),
+  ajustes: svgIcon('<path d="M4 7h9M17 7h3M15 5v4M4 17h3M11 17h9M9 15v4"/>'),
+  left: svgIcon('<path d="M15 6l-6 6 6 6"/>'),
+  right: svgIcon('<path d="M9 6l6 6-6 6"/>'),
+  edit: svgIcon('<path d="M4 20h4L19 9l-4-4L4 16z"/>'),
+};
+const TABS = [['hoy', 'Hoy'], ['semana', 'Semana'], ['metas', 'Metas'], ['gastos', 'Gastos'], ['ajustes', 'Ajustes']];
+
+/* ================= Gráficas (SVG propio, sin librerías) ================= */
+const Charts = {
+  bars: (items, ariaLabel) => {
+    const W = 320, H = 170, top = 18, bottom = 22;
+    const totals = items.map(it => it.parts.reduce((s, p) => s + p.value, 0));
+    const max = Math.max(1, ...totals);
+    const slot = W / items.length;
+    const barW = Math.min(30, slot * 0.58);
+    const scale = (H - top - bottom) / max;
+    const bars = items.map((it, i) => {
+      const x = i * slot + (slot - barW) / 2;
+      const cx = i * slot + slot / 2;
+      let y = H - bottom;
+      const rects = it.parts.filter(p => p.value > 0).map(p => {
+        const h = Math.max(1.5, p.value * scale);
+        y -= h;
+        return `<rect class="${p.cls}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="3"/>`;
+      }).join('');
+      const val = totals[i] ? `<text class="val" x="${cx}" y="${(y - 5).toFixed(1)}">${compactMoney(totals[i])}</text>` : '';
+      return `${rects}${val}<text class="lab${it.hi ? ' hi' : ''}" x="${cx}" y="${H - 6}">${esc(it.label)}</text>`;
+    }).join('');
+    return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(ariaLabel)}"><line class="base" x1="0" x2="${W}" y1="${H - bottom + 0.5}" y2="${H - bottom + 0.5}"/>${bars}</svg>`;
+  },
+};
+
+/* ================= Vista: Hoy ================= */
+const daySentence = (t, isWork) => {
+  if (!t.passengers) return isWork ? 'Toca un asiento libre para registrar a cada pasajero.' : 'No es día de trabajo, pero igual puedes registrar viajes.';
+  const owed = t.pending ? ` Te deben ${money(t.pending)}.` : '';
+  return `Llevas ${plural(t.passengers, 'pasajero', 'pasajeros')} y ${money(Ledger.collected(t))} cobrados.${owed}`;
+};
+const renderSeat = (trip, p, dir, i, selected) => {
+  if (!p) return `<button class="seat is-empty" data-action="seat" data-dir="${dir}" data-i="${i}" aria-label="Agregar pasajero a ${esc(label(dir))}"><span class="seat-glyph">+</span><span class="seat-sub">Libre</span></button>`;
+  const fare = Ledger.fare(trip, p);
+  const glyph = p.name ? esc(p.name.trim().charAt(0).toUpperCase()) : (p.method === 'nequi' ? 'N' : '$');
+  const state = p.paid ? 'pagó' : 'debe';
+  return `<button class="seat m-${p.method}${p.paid ? '' : ' is-pending'}${selected ? ' is-selected' : ''}" data-action="seat" data-dir="${dir}" data-i="${i}" aria-pressed="${selected}" aria-label="Pasajero ${i + 1}, ${METHODS[p.method]}, ${state} ${money(fare)}"><span class="seat-glyph">${glyph}</span><span class="seat-sub">${p.paid ? compactMoney(fare) : 'Debe'}</span></button>`;
+};
+const renderSeatEditor = (trip, dir, i) => {
+  const p = trip.passengers[i];
+  const at = `data-dir="${dir}" data-i="${i}"`;
+  const methodBtns = Object.keys(METHODS).map(m => `<button class="${p.method === m ? `on m-${m}` : ''}" data-action="set-method" ${at} data-v="${m}">${METHODS[m]}</button>`).join('');
+  const amount = trip.samePrice ? '' : `<label class="money"><span>$</span><input type="text" inputmode="numeric" data-field="p-amount" ${at} value="${moneyInput(p.amount)}" placeholder="Valor de este pasajero" aria-label="Valor de este pasajero"></label>`;
+  return `<div class="seat-editor">
+    <div class="seg" role="group" aria-label="Medio de pago">${methodBtns}</div>
+    <div class="seg" role="group" aria-label="Estado del pago">
+      <button class="${p.paid ? 'on' : ''}" data-action="set-paid" ${at} data-v="1">Pagó</button>
+      <button class="${p.paid ? '' : 'on is-debt'}" data-action="set-paid" ${at} data-v="0">Debe</button>
+    </div>
+    ${amount}
+    <input class="text" type="text" data-field="p-name" ${at} value="${esc(p.name || '')}" placeholder="Nombre o apodo (opcional)" maxlength="30" aria-label="Nombre del pasajero">
+    <div class="editor-actions">
+      <button class="ghost danger" data-action="remove-passenger" ${at}>Quitar pasajero</button>
+      <button class="primary" data-action="close-editor">Listo</button>
+    </div>
+  </div>`;
+};
+const renderTrip = (key, dir) => {
+  const { state, ui } = app;
+  const trip = Ledger.trip(state, key, dir);
+  const passengers = trip ? trip.passengers : [];
+  const same = trip ? trip.samePrice : true;
+  const price = trip ? trip.price : state.settings.fares[dir];
+  const tally = trip ? Ledger.addTrip(Ledger.emptyTally(), dir, trip) : Ledger.emptyTally();
+  const sel = ui.sel && ui.sel.dir === dir ? ui.sel.idx : -1;
+  const seats = Array.from({ length: MAX_SEATS }, (_, i) => renderSeat(trip, passengers[i], dir, i, sel === i)).join('');
+  const fareControl = same
+    ? `<label class="money"><span>$</span><input type="text" inputmode="numeric" data-field="trip-price" data-dir="${dir}" value="${moneyInput(price)}" placeholder="Tarifa por pasajero" aria-label="Tarifa por pasajero"></label>`
+    : '<span class="hint">Toca cada asiento para poner su valor.</span>';
+  return `<article class="trip">
+    <header class="trip-head"><h2>${esc(label(dir))}</h2><span class="trip-count">${passengers.length} de ${MAX_SEATS}</span><span class="trip-sum">${money(tally.billed)}</span></header>
+    <div class="seats" role="group" aria-label="Cupos de ${esc(label(dir))}">${seats}</div>
+    ${sel >= 0 && passengers[sel] ? renderSeatEditor(trip, dir, sel) : ''}
+    <div class="fare-row">
+      <label class="check"><input type="checkbox" data-field="trip-same" data-dir="${dir}" ${same ? 'checked' : ''}><span>Todos pagan lo mismo</span></label>
+      ${fareControl}
+    </div>
+  </article>`;
+};
+const renderPending = () => {
+  const list = Ledger.pendingList(app.state);
+  if (!list.length) return '';
+  const total = list.reduce((s, it) => s + it.amount, 0);
+  const rows = list.slice(0, 40).map(it => `<li>
+      <div><strong>${esc(it.passenger.name || `Pasajero ${it.index + 1}`)}</strong><span class="muted">${Calendar.short(it.key)}, ${esc(label(it.dir))}, ${METHODS[it.passenger.method]}</span></div>
+      <span class="amt">${money(it.amount)}</span>
+      <button class="small" data-action="mark-paid" data-key="${it.key}" data-dir="${it.dir}" data-i="${it.index}">Ya pagó</button>
+    </li>`).join('');
+  return `<section><div class="section-head"><h2>Por cobrar</h2><span class="amt">${money(total)}</span></div><ul class="rows">${rows}</ul></section>`;
+};
+const renderToday = () => {
+  const { state, ui } = app;
+  const key = ui.day;
+  const isToday = key === Calendar.today();
+  const back = isToday ? '<span class="tag">Hoy</span>' : '<button class="link" data-action="day-today">Volver a hoy</button>';
+  return `<section>
+      <div class="day-nav">
+        <button class="icon-btn" data-action="day-shift" data-n="-1" aria-label="Día anterior">${Icons.left}</button>
+        <label class="date-label"><span class="date-title">${cap(Calendar.long(key))}</span><input type="date" data-field="day-pick" value="${key}" aria-label="Elegir fecha"></label>
+        <button class="icon-btn" data-action="day-shift" data-n="1" aria-label="Día siguiente">${Icons.right}</button>
+      </div>
+      <p class="day-meta"><span>Semana ${Calendar.isoWeek(key)}</span>${back}</p>
+      <p class="day-sentence">${daySentence(Ledger.dayTally(state, key), GoalPlanner.isWorkDay(state, key))}</p>
+    </section>
+    ${DIRECTIONS.map(dir => renderTrip(key, dir)).join('')}
+    <p class="legend"><span><i class="dot cash"></i>Efectivo</span><span><i class="dot nequi"></i>Nequi</span><span><i class="dot debt"></i>Borde punteado: debe</span></p>
+    ${renderPending()}`;
+};
+
+/* ================= Vista: Semana ================= */
+const renderWeekChart = (days, todayKey) => {
+  const items = days.map(k => {
+    const t = Ledger.dayTally(app.state, k);
+    return { label: DAY_SHORT[Calendar.weekday(k)], hi: k === todayKey, parts: [{ value: t.efectivo, cls: 'c-cash' }, { value: t.nequi, cls: 'c-nequi' }] };
+  });
+  return Charts.bars(items, 'Cobrado por día, efectivo y Nequi');
+};
+const renderTrendChart = start => {
+  const items = Array.from({ length: 8 }, (_, i) => {
+    const ws = Calendar.add(start, -7 * (7 - i));
+    const t = Ledger.rangeTally(app.state, ws, Calendar.add(ws, 6));
+    return { label: `S${Calendar.isoWeek(ws)}`, hi: i === 7, parts: [{ value: t.efectivo, cls: 'c-cash' }, { value: t.nequi, cls: 'c-nequi' }] };
+  });
+  return Charts.bars(items, 'Cobrado en las últimas 8 semanas');
+};
+const renderWeek = () => {
+  const { state, ui } = app;
+  const start = ui.week, end = Calendar.add(start, 6), today = Calendar.today();
+  const days = Array.from({ length: 7 }, (_, i) => Calendar.add(start, i));
+  const visible = days.filter(k => GoalPlanner.isWorkDay(state, k) || Ledger.dayTally(state, k).passengers > 0);
+  const t = Ledger.rangeTally(state, start, end);
+  const spent = Ledger.expensesBetween(state, start, end);
+  const net = Ledger.collected(t) - spent;
+  const rows = visible.map(k => {
+    const d = Ledger.dayTally(state, k);
+    const off = GoalPlanner.isWorkDay(state, k) ? '' : ' class="is-off"';
+    return `<tr${off}><td><button class="row-day" data-action="open-day" data-key="${k}">${Calendar.short(k)}</button></td><td>${d.subida}</td><td>${d.bajada}</td><td>${money(d.efectivo)}</td><td>${money(d.nequi)}</td></tr>`;
+  }).join('');
+  const thisWeek = start === Calendar.monday(today);
+  const range = `${Calendar.dayMonth(start)} al ${Calendar.dayMonth(end)}`;
+  return `<div class="week-nav">
+      <button class="icon-btn" data-action="week-shift" data-n="-1" aria-label="Semana anterior">${Icons.left}</button>
+      <div><h1 class="view-title">Semana ${Calendar.isoWeek(start)}</h1><span class="muted">${range}</span>${thisWeek ? '' : '<br><button class="link" data-action="week-today">Ir a esta semana</button>'}</div>
+      <button class="icon-btn" data-action="week-shift" data-n="1" aria-label="Semana siguiente">${Icons.right}</button>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>${esc(label('subida'))}</th><th>${esc(label('bajada'))}</th><th>Efectivo</th><th>Nequi</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5" class="muted">Sin días de trabajo marcados en Ajustes.</td></tr>'}</tbody>
+      <tfoot><tr><td>Total</td><td>${t.subida}</td><td>${t.bajada}</td><td>${money(t.efectivo)}</td><td>${money(t.nequi)}</td></tr></tfoot>
+    </table></div>
+    <div class="figures">
+      <div class="figure lead"><span>Total de la semana</span><strong>${money(Ledger.collected(t))}</strong></div>
+      <div class="figure"><span>En Nequi</span><strong>${money(t.nequi)}</strong></div>
+      <div class="figure"><span>En efectivo</span><strong>${money(t.efectivo)}</strong></div>
+      <div class="figure"><span>Por cobrar</span><strong>${money(t.pending)}</strong></div>
+      <div class="figure"><span>Gastos</span><strong>${money(spent)}</strong></div>
+      <div class="figure${net < 0 ? ' neg' : ''}"><span>Te queda</span><strong>${money(net)}</strong></div>
+      <div class="figure"><span>Pasajeros</span><strong>${t.passengers}</strong></div>
+    </div>
+    <div class="section-head"><h2>Cobrado por día</h2></div>
+    ${renderWeekChart(days, today)}
+    <p class="legend"><span><i class="dot cash"></i>Efectivo</span><span><i class="dot nequi"></i>Nequi</span></p>
+    <div class="section-head"><h2>Últimas 8 semanas</h2></div>
+    ${renderTrendChart(start)}
+    <p class="muted">Toca un día de la tabla para ver o corregir sus viajes.</p>`;
+};
+
+/* ================= Vista: Metas ================= */
+const goalSentence = p => {
+  const by = Calendar.dayMonth(p.goal.deadline);
+  if (p.status === 'done') return 'Meta cumplida. Puedes borrarla o subirle el monto.';
+  if (p.status === 'overdue') return `La fecha límite pasó. Te faltaron ${money(p.remaining)}; puedes moverla.`;
+  if (p.status === 'nodays') return `No quedan días de trabajo antes del ${by}. Mueve la fecha o revisa tus días en Ajustes.`;
+  if (p.status === 'nofare') return 'Pon tu tarifa en Ajustes para calcular cuántos pasajeros necesitas.';
+  const base = `Te faltan ${money(p.remaining)}. Hasta el ${by} tienes ${plural(p.days, 'día', 'días')} de trabajo (${p.trips} trayectos).`;
+  if (p.status === 'tight') return `${base} Ni con los 4 cupos llenos alcanzas: llegarías a ${money(p.reach)}. Sube el porcentaje o mueve la fecha.`;
+  return `${base} Necesitas ${plural(p.passengersTotal, 'pasajero', 'pasajeros')} más: mínimo ${p.minPerTrip} por trayecto (promedio ${decimal1(p.perTrip)}).`;
+};
+const renderGoalCard = p => {
+  const g = p.goal;
+  const cls = p.status === 'done' ? ' is-done' : '';
+  return `<article class="goal${cls}">
+    <div class="goal-head"><h3>${esc(g.name)}</h3><button class="icon-btn" data-action="goal-edit" data-id="${g.id}" aria-label="Editar ${esc(g.name)}">${Icons.edit}</button></div>
+    <p class="goal-amounts"><strong>${money(p.saved)}</strong> de ${money(g.target)}</p>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p.progress * 100)}"><span style="width:${(p.progress * 100).toFixed(1)}%"></span></div>
+    <p class="goal-meta">${g.pct} % de lo que te queda, hasta el ${Calendar.dayMonth(g.deadline)}</p>
+    <p class="goal-plan${p.status === 'tight' ? ' is-tight' : ''}">${goalSentence(p)}</p>
+  </article>`;
+};
+const renderOverview = (plans, summary) => {
+  const { state } = app;
+  const pctSum = plans.filter(p => p.status !== 'done').reduce((s, p) => s + Number(p.goal.pct), 0);
+  const pace = GoalPlanner.recentPace(state);
+  const paceLine = pace === null ? '' : `<p>Tu promedio de las últimas dos semanas: ${decimal1(pace)} pasajeros por trayecto.</p>`;
+  const pctLine = pctSum > 100 ? `<p class="goal-plan is-tight">Tus metas suman ${pctSum} % de lo que te queda. Bájale a alguna para que los cálculos sean reales.</p>` : '';
+  if (!summary) return `<div class="overview"><p class="big-line">No hay metas pendientes por calcular.</p>${paceLine}${pctLine}</div>`;
+  const need = Math.min(summary.minPerTrip, MAX_SEATS);
+  const seats = Array.from({ length: MAX_SEATS }, (_, i) => `<span class="mini-seat${i < need ? (summary.tight ? ' over' : ' on') : ''}"></span>`).join('');
+  const headline = summary.tight
+    ? 'Con 4 cupos no alcanzas todas tus metas a tiempo.'
+    : `Para cumplir todas tus metas necesitas mínimo ${plural(summary.minPerTrip, 'pasajero', 'pasajeros')} por trayecto.`;
+  return `<div class="overview"><p class="big-line">${headline}</p><div class="mini-seats" aria-hidden="true">${seats}</div>${paceLine}${pctLine}</div>`;
+};
+const renderGoals = () => {
+  const { state } = app;
+  const today = Calendar.today();
+  const head = '<h1 class="view-title">Metas</h1>';
+  const add = '<button class="primary" data-action="goal-new">Nueva meta</button>';
+  if (!state.goals.length) {
+    return `${head}<div class="empty"><p>Crea una meta: cuánto quieres ahorrar, qué porcentaje de lo que te queda va para ella y para cuándo. La app calcula cuántos pasajeros necesitas por trayecto.</p>${add}</div>`;
+  }
+  const plans = state.goals.slice().sort((a, b) => a.deadline.localeCompare(b.deadline)).map(g => GoalPlanner.plan(state, g, today));
+  const summary = GoalPlanner.summarize(plans);
+  return `${head}${renderOverview(plans, summary)}
+    ${plans.map(renderGoalCard).join('')}
+    <div class="stack">${add}<p class="muted">Lo que te queda es lo que cobras menos tus gastos. Cada meta ahorra su porcentaje desde su fecha de inicio. Los pasajeros pendientes de pago no cuentan hasta que paguen.</p></div>`;
+};
+const renderGoalSheet = () => {
+  const { state, ui } = app;
+  const g = state.goals.find(x => x.id === ui.sheet.id);
+  const today = Calendar.today();
+  const del = g ? `<button class="ghost danger" data-action="goal-delete" data-id="${g.id}">Eliminar meta</button>` : '';
+  return `<div class="sheet-backdrop" data-action="sheet-close-backdrop"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <h2 id="sheet-title">${g ? 'Editar meta' : 'Nueva meta'}</h2>
+    <label class="field"><span>Nombre</span><input id="g-name" type="text" maxlength="40" value="${esc(g?.name || '')}" placeholder="Ej. Viaje de diciembre"></label>
+    <label class="field"><span>Cuánto quieres ahorrar</span><span class="money"><span>$</span><input id="g-target" type="text" inputmode="numeric" value="${moneyInput(g?.target)}" placeholder="0"></span></label>
+    <label class="field"><span>Porcentaje de lo que te queda para esta meta</span><span class="money"><input id="g-pct" type="text" inputmode="numeric" value="${g?.pct ?? ''}" placeholder="Ej. 30"><span>%</span></span></label>
+    <div class="field-row">
+      <label class="field"><span>Contar desde</span><input id="g-start" type="date" value="${g?.start || today}"></label>
+      <label class="field"><span>Fecha límite</span><input id="g-deadline" type="date" value="${g?.deadline || ''}"></label>
+    </div>
+    <p class="form-error" id="g-error" role="alert"></p>
+    <div class="sheet-actions"><button class="ghost" data-action="sheet-close">Cancelar</button><button class="primary" data-action="goal-save">Guardar meta</button></div>
+    ${del ? `<div class="sheet-actions">${del}</div>` : ''}
+  </div></div>`;
+};
+
+/* ================= Hojas de clave ================= */
+const PIN_PURPOSE = {
+  reset: { title: 'Borrar todos los datos', text: 'Se borran viajes, gastos y metas. Tu clave se mantiene.', button: 'Borrar todo' },
+  restore: { title: 'Restaurar copia', text: 'Tus datos actuales se reemplazan por los de la copia.', button: 'Restaurar' },
+};
+const pinInput = (id, placeholder, auto) => `<input id="${id}" class="text" type="password" autocomplete="${auto}" maxlength="20" placeholder="${placeholder}">`;
+const sheetFrame = (title, body, closable) => `<div class="sheet-backdrop"${closable ? ' data-action="sheet-close-backdrop"' : ''}><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><h2 id="sheet-title">${title}</h2>${body}</div></div>`;
+const renderPinSetup = () => sheetFrame('Crea tu clave', `
+  <p class="lede">Esta clave se pide para borrar todos los datos o restaurar una copia. Anótala en un lugar seguro, porque no se puede recuperar.</p>
+  <label class="field"><span>Clave (mínimo 4 caracteres)</span>${pinInput('pin-1', 'Tu clave', 'new-password')}</label>
+  <label class="field"><span>Repite la clave</span>${pinInput('pin-2', 'Otra vez', 'new-password')}</label>
+  <p class="form-error" id="pin-error" role="alert"></p>
+  <div class="sheet-actions"><button class="primary" data-action="pin-create">Guardar clave</button></div>`, false);
+const renderPinCheck = () => {
+  const p = PIN_PURPOSE[app.ui.sheet.purpose];
+  return sheetFrame(p.title, `
+    <p class="lede">${p.text}</p>
+    <label class="field"><span>Escribe tu clave</span>${pinInput('pin-check', 'Clave', 'current-password')}</label>
+    <p class="form-error" id="pin-error" role="alert"></p>
+    <div class="sheet-actions"><button class="ghost" data-action="sheet-close">Cancelar</button><button class="primary danger-fill" data-action="pin-confirm">${p.button}</button></div>`, true);
+};
+const renderPinChange = () => sheetFrame('Cambiar clave', `
+  <label class="field"><span>Clave actual</span>${pinInput('pin-old', 'Clave actual', 'current-password')}</label>
+  <label class="field"><span>Clave nueva</span>${pinInput('pin-1', 'Mínimo 4 caracteres', 'new-password')}</label>
+  <label class="field"><span>Repite la clave nueva</span>${pinInput('pin-2', 'Otra vez', 'new-password')}</label>
+  <p class="form-error" id="pin-error" role="alert"></p>
+  <div class="sheet-actions"><button class="ghost" data-action="sheet-close">Cancelar</button><button class="primary" data-action="pin-update">Guardar clave</button></div>`, true);
+const SHEETS = { goal: renderGoalSheet, 'pin-setup': renderPinSetup, 'pin-check': renderPinCheck, 'pin-change': renderPinChange };
+
+/* ================= Vista: Gastos ================= */
+const CONCEPTS = ['Gasolina', 'Peaje', 'Parqueadero', 'Mantenimiento', 'Lavado', 'Otro'];
+const renderExpenses = () => {
+  const { state, ui } = app;
+  const chips = CONCEPTS.map(c => `<button class="chip-btn${ui.concept === c ? ' on' : ''}" data-action="concept" data-v="${c}" aria-pressed="${ui.concept === c}">${c}</button>`).join('');
+  const other = ui.concept === 'Otro' ? '<input id="exp-other" class="text" type="text" maxlength="40" placeholder="¿En qué gastaste?">' : '';
+  const sorted = state.expenses.slice().sort((a, b) => b.date.localeCompare(a.date));
+  const months = [];
+  sorted.forEach(e => {
+    const m = e.date.slice(0, 7);
+    if (!months.length || months[months.length - 1].m !== m) months.push({ m, items: [] });
+    months[months.length - 1].items.push(e);
+  });
+  const list = months.map(({ m, items }) => `<div class="month-head"><span>${Calendar.monthName(`${m}-01`)}</span><span>${money(items.reduce((s, e) => s + e.amount, 0))}</span></div>
+    <ul class="rows">${items.map(e => `<li><div><strong>${esc(e.concept)}</strong><span class="muted">${Calendar.short(e.date)} de ${MONTHS[Calendar.date(e.date).getMonth()]}</span></div><span class="amt">${money(e.amount)}</span><button class="small" data-action="expense-delete" data-id="${e.id}" data-confirm="¿Borrar?">Borrar</button></li>`).join('')}</ul>`).join('');
+  return `<h1 class="view-title">Gastos</h1>
+    <p class="lede">Anota lo que gastas en el carro cuando quieras. Se resta de lo que cobras para calcular tus metas.</p>
+    <div class="stack">
+      <div class="chips" role="group" aria-label="Concepto">${chips}</div>
+      ${other}
+      <div class="field-row">
+        <label class="field"><span>Fecha</span><input id="exp-date" type="date" value="${Calendar.today()}"></label>
+        <label class="field"><span>Valor</span><span class="money"><span>$</span><input id="exp-amount" type="text" inputmode="numeric" placeholder="0"></span></label>
+      </div>
+      <p class="form-error" id="exp-error" role="alert"></p>
+      <button class="primary" data-action="expense-add">Agregar gasto</button>
+    </div>
+    ${list || '<p class="empty">Todavía no hay gastos anotados.</p>'}`;
+};
+
+/* ================= Vista: Ajustes ================= */
+const renderSettings = () => {
+  const { state, ui } = app;
+  const s = state.settings;
+  const order = [1, 2, 3, 4, 5, 6, 0];
+  const days = order.map(d => `<button class="chip-btn${s.workDays.includes(d) ? ' on' : ''}" data-action="workday" data-d="${d}" aria-pressed="${s.workDays.includes(d)}">${DAY_SHORT[d]}</button>`).join('');
+  const dirFields = DIRECTIONS.map(dir => `<div class="field-row">
+      <label class="field"><span>Nombre del trayecto</span><input class="text" type="text" maxlength="20" data-field="label" data-dir="${dir}" value="${esc(label(dir))}"></label>
+      <label class="field"><span>Tarifa por pasajero</span><span class="money"><span>$</span><input type="text" inputmode="numeric" data-field="fare" data-dir="${dir}" value="${moneyInput(s.fares[dir])}" placeholder="0"></span></label>
+    </div>`).join('');
+  const backupBox = ui.backupText ? `<textarea class="backup" readonly aria-label="Copia de seguridad">${esc(ui.backupText)}</textarea><p class="muted">Selecciona todo el texto, cópialo y guárdalo en Notas o envíatelo por WhatsApp.</p>` : '';
+  return `<h1 class="view-title">Ajustes</h1>
+    <div class="section-head"><h2>Trayectos y tarifas</h2></div>
+    <p class="lede">La tarifa es la que aparece por defecto al registrar un viaje. Cada día la puedes cambiar.</p>
+    ${dirFields}
+    <div class="section-head"><h2>Días que trabajas</h2><span class="muted">${plural(s.workDays.length, 'día', 'días')}</span></div>
+    <div class="chips" role="group" aria-label="Días de trabajo">${days}</div>
+    <p class="muted">Las metas se calculan solo con estos días.</p>
+    <div class="section-head"><h2>Copia de seguridad</h2></div>
+    <p class="lede">Tus datos se guardan en este dispositivo. Haz una copia cada semana; también sirve para pasar tus datos del iPhone al iPad.</p>
+    <div class="stack">
+      <button class="primary" data-action="backup-download">Descargar copia</button>
+      <button class="ghost" data-action="backup-copy">Copiar copia como texto</button>
+      ${backupBox}
+      <label class="field"><span>Restaurar desde archivo</span><input type="file" accept=".json,application/json,text/plain" data-field="restore-file"></label>
+      <label class="field"><span>O pega aquí el texto de una copia</span><textarea id="restore-text" class="backup" placeholder="Pega la copia aquí"></textarea></label>
+      <button class="ghost" data-action="restore-text">Restaurar copia pegada</button>
+    </div>
+    <div class="section-head"><h2>Clave</h2></div>
+    <p class="lede">Se pide para borrar todos los datos o restaurar una copia.</p>
+    <button class="ghost" data-action="pin-change-open">Cambiar clave</button>
+    <div class="section-head"><h2>Empezar de cero</h2></div>
+    <button class="ghost danger" data-action="reset-all">Borrar todos los datos</button>`;
+};
+
+/* ================= Render principal ================= */
+const VIEWS = { hoy: renderToday, semana: renderWeek, metas: renderGoals, gastos: renderExpenses, ajustes: renderSettings };
+const render = () => {
+  clearTimeout(renderTimer);
+  const banner = CarpoolStore.available ? '' : '<p class="banner">Este navegador no está guardando tus datos. Descarga una copia en Ajustes antes de cerrar.</p>';
+  document.getElementById('view').innerHTML = banner + VIEWS[app.ui.tab]();
+  document.getElementById('tabs').innerHTML = TABS.map(([id, name]) => `<button class="tab" data-action="tab" data-tab="${id}"${app.ui.tab === id ? ' aria-current="page"' : ''}>${Icons[id]}<span>${name}</span></button>`).join('');
+  document.getElementById('sheet-root').innerHTML = app.ui.sheet ? SHEETS[app.ui.sheet.type]() : '';
+};
+
+/* ================= Acciones ================= */
+const passengerAt = el => {
+  const trip = Ledger.trip(app.state, el.dataset.key || app.ui.day, el.dataset.dir);
+  return trip ? trip.passengers[Number(el.dataset.i)] : null;
+};
+const confirmTap = el => {
+  if (el.dataset.armed === '1') return true;
+  const original = el.textContent;
+  el.dataset.armed = '1';
+  el.textContent = el.dataset.confirm || '¿Seguro? Toca otra vez';
+  el.classList.add('armed');
+  setTimeout(() => {
+    if (!el.isConnected) return;
+    el.dataset.armed = '';
+    el.textContent = original;
+    el.classList.remove('armed');
+  }, 3500);
+  return false;
+};
+const backupJson = () => JSON.stringify({ app: 'cupos', exportedAt: new Date().toISOString(), data: app.state });
+const importBackup = text => {
+  try {
+    const parsed = JSON.parse(text);
+    const data = parsed && parsed.data ? parsed.data : parsed;
+    if (!data || typeof data !== 'object' || !('trips' in data)) throw new Error('formato');
+    const currentPin = app.state.settings.pinHash;
+    app.state = normalizeState(data);
+    app.state.settings.pinHash = currentPin || app.state.settings.pinHash;
+    app.ui.sel = null;
+    app.ui.sheet = null;
+    commit();
+    toast('Copia restaurada');
+  } catch (err) {
+    toast('Ese texto no es una copia válida de Cupos');
+  }
+};
+const readGoalForm = () => {
+  const val = id => document.getElementById(id)?.value || '';
+  const goal = {
+    name: val('g-name').trim() || 'Meta',
+    target: parseMoney(val('g-target')),
+    pct: Math.round(parseMoney(val('g-pct'))),
+    start: val('g-start') || Calendar.today(),
+    deadline: val('g-deadline'),
+  };
+  if (!goal.target) return { error: 'Escribe cuánto quieres ahorrar.' };
+  if (goal.pct < 1 || goal.pct > 100) return { error: 'El porcentaje va de 1 a 100.' };
+  if (!Calendar.isValid(goal.deadline)) return { error: 'Elige la fecha límite.' };
+  if (goal.deadline < goal.start) return { error: 'La fecha límite debe ser después de la fecha de inicio.' };
+  return { goal };
+};
+const focusSheet = () => document.querySelector('#sheet-root input')?.focus();
+const pinError = msg => { const el = document.getElementById('pin-error'); if (el) el.textContent = msg; };
+const pinValue = id => document.getElementById(id)?.value || '';
+const askPin = (purpose, text = '') => { app.ui.pendingRestore = text; app.ui.sheet = { type: 'pin-check', purpose }; render(); focusSheet(); };
+const checkNewPin = () => {
+  const a = pinValue('pin-1'), b = pinValue('pin-2');
+  if (a.length < 4) return 'La clave debe tener mínimo 4 caracteres.';
+  if (a !== b) return 'Las dos claves no coinciden.';
+  return '';
+};
+const runProtected = purpose => {
+  app.ui.sheet = null;
+  if (purpose === 'restore') {
+    const text = app.ui.pendingRestore;
+    app.ui.pendingRestore = '';
+    render();
+    importBackup(text);
+    return;
+  }
+  const pinHash = app.state.settings.pinHash;
+  app.state = defaultState();
+  app.state.settings.pinHash = pinHash;
+  app.ui.sel = null;
+  commit();
+  toast('Datos borrados');
+};
+const Actions = {
+  tab: el => { app.ui.tab = el.dataset.tab; app.ui.sel = null; render(); window.scrollTo(0, 0); },
+  'day-shift': el => { app.ui.day = Calendar.add(app.ui.day, Number(el.dataset.n)); app.ui.sel = null; render(); },
+  'day-today': () => { app.ui.day = Calendar.today(); app.ui.sel = null; render(); },
+  seat: el => {
+    const dir = el.dataset.dir, i = Number(el.dataset.i);
+    const trip = Ledger.trip(app.state, app.ui.day, dir);
+    if (trip && trip.passengers[i]) {
+      const same = app.ui.sel && app.ui.sel.dir === dir && app.ui.sel.idx === i;
+      app.ui.sel = same ? null : { dir, idx: i };
+      render();
+      return;
+    }
+    const t = Ledger.ensureTrip(app.state, app.ui.day, dir);
+    if (t.passengers.length >= MAX_SEATS) return;
+    t.passengers.push({ method: app.state.settings.lastMethod, paid: true, amount: t.price || app.state.settings.fares[dir] || 0, name: '' });
+    app.ui.sel = { dir, idx: t.passengers.length - 1 };
+    commit();
+  },
+  'set-method': el => {
+    const p = passengerAt(el);
+    if (!p) return;
+    p.method = el.dataset.v;
+    app.state.settings.lastMethod = el.dataset.v;
+    commit();
+  },
+  'set-paid': el => { const p = passengerAt(el); if (!p) return; p.paid = el.dataset.v === '1'; commit(); },
+  'remove-passenger': el => {
+    const trip = Ledger.trip(app.state, app.ui.day, el.dataset.dir);
+    if (!trip) return;
+    trip.passengers.splice(Number(el.dataset.i), 1);
+    app.ui.sel = null;
+    commit();
+  },
+  'close-editor': () => { app.ui.sel = null; render(); },
+  'mark-paid': el => { const p = passengerAt(el); if (!p) return; p.paid = true; commit(); toast('Marcado como pagado'); },
+  'week-shift': el => { app.ui.week = Calendar.add(app.ui.week, 7 * Number(el.dataset.n)); render(); },
+  'week-today': () => { app.ui.week = Calendar.monday(Calendar.today()); render(); },
+  'open-day': el => { app.ui.day = el.dataset.key; app.ui.tab = 'hoy'; app.ui.sel = null; render(); window.scrollTo(0, 0); },
+  'goal-new': () => { app.ui.sheet = { type: 'goal', id: null }; render(); document.getElementById('g-name')?.focus(); },
+  'goal-edit': el => { app.ui.sheet = { type: 'goal', id: el.dataset.id }; render(); },
+  'sheet-close': () => { app.ui.sheet = null; render(); },
+  'sheet-close-backdrop': (el, e) => { if (e.target !== el) return; app.ui.sheet = null; render(); },
+  'goal-save': () => {
+    const { goal, error } = readGoalForm();
+    if (error) { document.getElementById('g-error').textContent = error; return; }
+    const existing = app.state.goals.find(g => g.id === app.ui.sheet.id);
+    if (existing) Object.assign(existing, goal);
+    else app.state.goals.push({ id: newId(), ...goal });
+    app.ui.sheet = null;
+    commit();
+    toast('Meta guardada');
+  },
+  'goal-delete': el => {
+    if (!confirmTap(el)) return;
+    app.state.goals = app.state.goals.filter(g => g.id !== el.dataset.id);
+    app.ui.sheet = null;
+    commit();
+  },
+  concept: el => { app.ui.concept = el.dataset.v; render(); },
+  'expense-add': () => {
+    const amount = parseMoney(document.getElementById('exp-amount')?.value);
+    const date = document.getElementById('exp-date')?.value;
+    const other = document.getElementById('exp-other')?.value.trim();
+    const concept = app.ui.concept === 'Otro' ? (other || 'Otro') : app.ui.concept;
+    const error = !amount ? 'Escribe el valor del gasto.' : (!Calendar.isValid(date) ? 'Elige la fecha.' : '');
+    if (error) { document.getElementById('exp-error').textContent = error; return; }
+    app.state.expenses.push({ id: newId(), date, concept, amount });
+    commit();
+    toast('Gasto agregado');
+  },
+  'expense-delete': el => {
+    if (!confirmTap(el)) return;
+    app.state.expenses = app.state.expenses.filter(e => e.id !== el.dataset.id);
+    commit();
+  },
+  workday: el => {
+    const d = Number(el.dataset.d);
+    const set = app.state.settings.workDays;
+    app.state.settings.workDays = set.includes(d) ? set.filter(x => x !== d) : [...set, d].sort();
+    commit();
+  },
+  'backup-download': async () => {
+    const filename = `cupos-copia-${Calendar.today()}.json`;
+    const downloads = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
+    if (downloads) {
+      try {
+        await downloads.save({ filename, data: backupJson() });
+        toast('Copia descargada');
+      } catch (err) {
+        toast('No se descargó. Usa “Copiar copia como texto”.');
+      }
+      return;
+    }
+    try {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([backupJson()], { type: 'application/json' }));
+      a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      toast('Si no se descargó, usa “Copiar copia como texto”.');
+    } catch (err) {
+      toast('No se pudo descargar. Usa “Copiar copia como texto”.');
+    }
+  },
+  'backup-copy': async () => {
+    try {
+      await navigator.clipboard.writeText(backupJson());
+      toast('Copia copiada. Pégala en Notas o en WhatsApp.');
+    } catch (err) {
+      app.ui.backupText = backupJson();
+      render();
+    }
+  },
+  'restore-text': () => {
+    const text = document.getElementById('restore-text')?.value.trim();
+    if (!text) { toast('Primero pega el texto de la copia.'); return; }
+    askPin('restore', text);
+  },
+  'reset-all': () => askPin('reset'),
+  'pin-change-open': () => { app.ui.sheet = { type: 'pin-change' }; render(); focusSheet(); },
+  'pin-create': async () => {
+    const error = checkNewPin();
+    if (error) { pinError(error); return; }
+    app.state.settings.pinHash = await hashPin(pinValue('pin-1'));
+    app.ui.sheet = null;
+    commit();
+    toast('Clave guardada');
+  },
+  'pin-confirm': async () => {
+    const ok = (await hashPin(pinValue('pin-check'))) === app.state.settings.pinHash;
+    if (!ok) { pinError('Esa no es la clave.'); return; }
+    runProtected(app.ui.sheet.purpose);
+  },
+  'pin-update': async () => {
+    if ((await hashPin(pinValue('pin-old'))) !== app.state.settings.pinHash) { pinError('La clave actual no es correcta.'); return; }
+    const error = checkNewPin();
+    if (error) { pinError(error); return; }
+    app.state.settings.pinHash = await hashPin(pinValue('pin-1'));
+    app.ui.sheet = null;
+    commit();
+    toast('Clave cambiada');
+  },
+};
+
+/* ================= Campos editables ================= */
+const Fields = {
+  'day-pick': el => { if (!Calendar.isValid(el.value)) return; app.ui.day = el.value; app.ui.sel = null; render(); },
+  'trip-same': el => {
+    const trip = Ledger.ensureTrip(app.state, app.ui.day, el.dataset.dir);
+    trip.samePrice = el.checked;
+    if (!el.checked) trip.passengers.forEach(p => { p.amount = p.amount || trip.price; });
+    commit();
+  },
+  'trip-price': el => {
+    const trip = Ledger.ensureTrip(app.state, app.ui.day, el.dataset.dir);
+    trip.price = parseMoney(el.value);
+    save(); scheduleRender();
+  },
+  'p-amount': el => { const p = passengerAt(el); if (!p) return; p.amount = parseMoney(el.value); save(); scheduleRender(); },
+  'p-name': el => { const p = passengerAt(el); if (!p) return; p.name = el.value.trim().slice(0, 30); save(); scheduleRender(); },
+  label: el => { app.state.settings.labels[el.dataset.dir] = el.value.trim().slice(0, 20) || cap(el.dataset.dir); save(); scheduleRender(); },
+  fare: el => { app.state.settings.fares[el.dataset.dir] = parseMoney(el.value); save(); scheduleRender(); },
+  'restore-file': el => {
+    const file = el.files && el.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { el.value = ''; askPin('restore', String(reader.result || '')); };
+    reader.onerror = () => toast('No se pudo leer el archivo');
+    reader.readAsText(file);
+  },
+};
+
+document.addEventListener('click', e => {
+  const dateInput = e.target.closest('.date-label input[type="date"]');
+  if (dateInput && dateInput.showPicker) { try { dateInput.showPicker(); } catch (err) { /* el navegador abre su selector */ } }
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = Actions[el.dataset.action];
+  if (!action) return;
+  clearTimeout(renderTimer);
+  action(el, e);
+});
+document.addEventListener('change', e => {
+  const el = e.target.closest('[data-field]');
+  if (!el) return;
+  const field = Fields[el.dataset.field];
+  if (field) field(el);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && app.ui.sheet && app.ui.sheet.type !== 'pin-setup') { app.ui.sheet = null; render(); }
+  if (e.key === 'Enter' && e.target.matches('input[data-field]')) e.target.blur();
+});
+window.addEventListener('storage', e => { if (e.key === STORAGE_KEY) { app.state = CarpoolStore.load(); render(); } });
+
+if (!app.state.settings.pinHash) app.ui.sheet = { type: 'pin-setup' };
+render();
+</script>
+</body>
+</html>
